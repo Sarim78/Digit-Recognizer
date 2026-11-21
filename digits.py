@@ -1,13 +1,47 @@
+import os
+import gzip
+import urllib.request
 import numpy as np
-from sklearn.datasets import fetch_openml
 
 # ---------- Step 1: load the data ----------
-mnist = fetch_openml("mnist_784", version=1, as_frame=False)
-X = mnist.data.astype(np.float32) / 255.0
-y = mnist.target.astype(np.int64)
+MIRRORS = [
+    "https://ossci-datasets.s3.amazonaws.com/mnist/",
+    "https://storage.googleapis.com/cvdf-datasets/mnist/",
+]
+FILES = {
+    "train_images": "train-images-idx3-ubyte.gz",
+    "train_labels": "train-labels-idx1-ubyte.gz",
+    "test_images": "t10k-images-idx3-ubyte.gz",
+    "test_labels": "t10k-labels-idx1-ubyte.gz",
+}
 
-X_train, X_test = X[:60000], X[60000:]
-y_train, y_test = y[:60000], y[60000:]
+def download(filename, folder="mnist_data"):
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.join(folder, filename)
+    if os.path.exists(path):
+        return path
+    for base in MIRRORS:
+        try:
+            print("Downloading", filename)
+            urllib.request.urlretrieve(base + filename, path)
+            return path
+        except Exception as e:
+            print("  failed on", base, "-", e)
+    raise RuntimeError("Could not download " + filename)
+
+def read_images(path):
+    with gzip.open(path, "rb") as f:
+        data = np.frombuffer(f.read(), dtype=np.uint8, offset=16)
+    return data.reshape(-1, 784).astype(np.float32) / 255.0
+
+def read_labels(path):
+    with gzip.open(path, "rb") as f:
+        return np.frombuffer(f.read(), dtype=np.uint8, offset=8).astype(np.int64)
+
+X_train = read_images(download(FILES["train_images"]))
+y_train = read_labels(download(FILES["train_labels"]))
+X_test = read_images(download(FILES["test_images"]))
+y_test = read_labels(download(FILES["test_labels"]))
 
 def one_hot(labels, k=10):
     out = np.zeros((len(labels), k), dtype=np.float32)
