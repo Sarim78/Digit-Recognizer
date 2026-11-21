@@ -9,6 +9,29 @@ n = len(net.W)
 net.W = [data[f"arr_{i}"] for i in range(n)]
 net.b = [data[f"arr_{i + n}"] for i in range(n)]
 
+def preprocess(img):
+    """Turn the 280x280 drawing into a 28x28 image the way MNIST digits are made."""
+    arr = np.array(img)
+    ys, xs = np.nonzero(arr > 20)
+    if len(xs) == 0:
+        return None
+    # 1. crop to the digit
+    crop = img.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
+    # 2. scale so the longest side is 20 pixels
+    w, h = crop.size
+    scale = 20.0 / max(w, h)
+    crop = crop.resize((max(1, round(w * scale)), max(1, round(h * scale))), Image.LANCZOS)
+    # 3. paste into the middle of a 28x28 image
+    small = Image.new("L", (28, 28), 0)
+    small.paste(crop, ((28 - crop.size[0]) // 2, (28 - crop.size[1]) // 2))
+    a = np.array(small, dtype=np.float32) / 255.0
+    # 4. shift so the center of mass sits at the center
+    total = a.sum()
+    if total > 0:
+        cy, cx = (np.indices(a.shape) * a).sum(axis=(1, 2)) / total
+        a = np.roll(a, (int(round(13.5 - float(cy))), int(round(13.5 - float(cx)))), axis=(0, 1))
+    return a
+
 class App:
     def __init__(self):
         self.root = tk.Tk()
@@ -29,9 +52,11 @@ class App:
         self.pen.ellipse([e.x - r, e.y - r, e.x + r, e.y + r], fill=255)
 
     def predict(self):
-        small = self.img.resize((28, 28), Image.LANCZOS)
-        x = np.array(small, dtype=np.float32).reshape(1, 784) / 255.0
-        probs = net.forward(x)[0]
+        a = preprocess(self.img)
+        if a is None:
+            self.label.config(text="Draw a digit first")
+            return
+        probs = net.forward(a.reshape(1, 784))[0]
         top = np.argsort(probs)[::-1][:3]
         self.label.config(text="   ".join(f"{d}: {probs[d] * 100:.0f}%" for d in top))
 
