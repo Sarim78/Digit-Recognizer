@@ -110,3 +110,7 @@ python demo.py
 - The network only knows MNIST-style digits, so messy handwriting can still fool it, and it can be confidently wrong. The percentages come from softmax and show how the network splits its belief, not how likely it is to be correct.
 - It is a plain fully connected network. A convolutional network would likely score higher because it handles the size and position of a digit better.
 - Each experiment was run once with one random starting point, so small differences (like the weight decay gain) may be noise.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
