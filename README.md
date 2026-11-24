@@ -60,15 +60,16 @@ Weight decay helped only a little. The best value, 0.01, gained 0.36 points, whi
 
 `demo.py` opens a small drawing box. Draw a digit with the mouse, click Predict, and the network shows its top three guesses with percentages.
 
-![Demo](results/demo.png)
+![Demo](results/Demo.png)
 
-The demo prepares your drawing the same way MNIST digits were prepared: it crops to the digit, scales it to 20 pixels tall, and centers it in a 28 by 28 image. Without this step, my first version of the demo confidently misread clear drawings (a 0 as a 3 and a 7 as a 5) because the plain network is sensitive to the size and position of a digit.
+The demo prepares your drawing the same way MNIST digits were prepared: it crops to the digit, scales the longest side to 20 pixels, and centers it in a 28 by 28 image. Without this step, my first version of the demo confidently misread clear drawings (a 0 as a 3 and a 7 as a 5) because the plain network is sensitive to the size and position of a digit.
 
 ## Project structure
 
 ```
 Digit-Recognizer/
 ├── README.md
+├── LICENSE
 ├── requirements.txt
 ├── digits.py                # network, training loop, and data loading
 ├── experiments.py           # activation comparison and overfitting experiments
