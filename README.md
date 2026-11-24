@@ -1,4 +1,4 @@
-# Digit Recognizer From Scratch
+# Digit Recognizer
 
 ![Course](https://img.shields.io/badge/Course-CP310B%20Neural%20Networks-blue)
 ![University](https://img.shields.io/badge/Wilfrid%20Laurier%20University-purple)
