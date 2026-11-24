@@ -60,7 +60,7 @@ Weight decay helped only a little. The best value, 0.01, gained 0.36 points, whi
 
 `demo.py` opens a small drawing box. Draw a digit with the mouse, click Predict, and the network shows its top three guesses with percentages.
 
-![Demo](results/demo_screenshot.png)
+![Demo](results/demo.png)
 
 The demo prepares your drawing the same way MNIST digits were prepared: it crops to the digit, scales it to 20 pixels tall, and centers it in a 28 by 28 image. Without this step, my first version of the demo confidently misread clear drawings (a 0 as a 3 and a 7 as a 5) because the plain network is sensitive to the size and position of a digit.
 
